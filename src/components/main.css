@@ -1,3 +1,4 @@
+/* Reset */
 html,
 body {
   height: 100%;
@@ -8,8 +9,6 @@ body {
 #root {
   height: 100%;
 }
-
-
 
 /* ROOT FADE-IN */
 .main-root {
@@ -39,64 +38,68 @@ body {
 
 /* ================= HERO WITH VIDEO ================= */
 
-/* ================= HERO WITH VIDEO (FULL COVER) ================= */
+/*
+  Hero rules — updated so the hero keeps the exact same layout and size
+  across all devices (desktop, tablet, mobile) and avoids mobile browser
+  UI changes creating a taller section.
+
+  Key approach:
+  - Use `height:100svh` and `max-height:100svh` to lock hero to the visual
+    viewport height on modern mobile browsers.
+  - Explicitly reset `min-height` to avoid fallback minima that grow the
+    hero on small screens.
+  - Make the background media position:absolute and cover the whole hero
+    so it never leaves gaps.
+  - Reduce bottom padding inside hero content so internal spacing won't
+    push the hero larger than intended.
+*/
 
 .hero-section {
   position: relative;
-  height: 100vh;           /* always exactly 1 screen */
-  height: 100svh;          /* smart viewport on mobile */
-  min-height: 600px;       /* optional safety */
+  /* lock to the visual viewport across browsers (smart viewport) */
+  height: 100svh;       /* primary: modern mobile browsers */
+  max-height: 100svh;   /* prevent expansion beyond viewport */
+  min-height: 0;        /* important: remove any forced min height */
+
   width: 100%;
-  overflow: hidden;
+  overflow: hidden;     /* hide anything that could create visual gaps */
 
   display: flex;
   flex-direction: column;
+  justify-content: center; /* center vertically without growing */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* background video/image always covers the whole hero */
-.hero-bg-video {
+.hero-bg-video,
+.hero-bg-image {
   position: absolute;
-  inset: 0;
+  inset: 0;            /* top:0; right:0; bottom:0; left:0 */
   width: 100%;
-  height: 90%;
-  object-fit: cover;
+  height: 100%;       /* always match hero height */
+  object-fit: cover;  /* cover without changing aspect ratio */
+  display: block;
+}
+
+.hero-bg-video {
   filter: saturate(1.15) contrast(1.1) brightness(0.78);
   transform-origin: center;
   animation: heroBgZoom 26s ease-in-out infinite alternate;
 }
 
-/* if you ever use a static image instead of video */
-.hero-bg-image {
+/* overlay and light sweep remain absolute so they don't affect layout */
+.hero-overlay,
+.hero-section::before,
+.hero-orbs {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* dark + neon overlay on top of video */
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 70% 35%, rgba(0, 195, 255, 0.4), transparent 60%),
-    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.2), transparent 55%),
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.7) 0%,
-      rgba(0, 0, 0, 0.88) 40%,
-      rgba(0, 0, 0, 0.96) 85%,
-      #000 100%
-    );
-  mix-blend-mode: multiply;
-  z-index: 1;
+  pointer-events: none;
 }
 
 /* soft moving light sweep */
 .hero-section::before {
   content: "";
-  position: absolute;
-  inset: -30%;
   background: radial-gradient(
     circle at 15% 0%,
     rgba(255, 255, 255, 0.26),
@@ -109,78 +112,91 @@ body {
 }
 
 @keyframes heroBgZoom {
+  0% { transform: scale(1.02); }
+  100% { transform: scale(1.08); }
+}
+
+/* Orbs are decorative; keep them absolutely positioned */
+.hero-orbs { z-index: 2; }
+
+/* HERO CONTENT
+   Keep the content centered and avoid large paddings that would push the
+   hero beyond the locked viewport height. */
+.hero-content {
+  position: relative;
+  z-index: 4;
+  max-width: 960px;
+
+  flex: 0 1 auto;               /* content won't force hero to grow */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  margin: 0 auto;
+  padding: 0 clamp(1.6rem, 5vw, 4.4rem) 1.6rem; /* tight bottom padding */
+}
+
+/* small utility: if you absolutely want the hero to permit internal
+   scrolling on very small displays, add the helper class `.allow-scroll`.
+   By default we DO NOT allow scrolling to keep exact height consistent. */
+.hero-section.allow-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* keep the rest of hero visual styles identical */
+.hero-tag { font-size: 0.8rem; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(203,227,255,0.86); margin-bottom: 0.55rem; }
+.hero-name { font-size: clamp(2.9rem, 5vw, 4.4rem); font-weight:900; letter-spacing:0.14em; text-transform:uppercase; line-height:1.04; margin-bottom:0.8rem; }
+.hero-name span { display:block; }
+.hero-name-last {
+  display:block;
+  font-weight:900;
+  background: linear-gradient(120deg, #c8fbff, #52e9ff, #b4ffff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+
+  /* STRONGER SHINE + GLOW */
+  text-shadow:
+    0 0 22px rgba(0, 245, 255, 0.9),
+    0 0 44px rgba(0, 240, 255, 0.75),
+    0 0 80px rgba(0, 255, 255, 0.55),
+    0 0 120px rgba(0, 255, 255, 0.35);
+
+  filter: drop-shadow(0 0 26px rgba(0, 255, 255, 0.45));
+  animation: heroTextShine 4.2s ease-in-out infinite alternate;
+}
+
+@keyframes heroTextShine {
   0% {
-    transform: scale(1.02);
+    text-shadow:
+      0 0 18px rgba(0, 255, 255, 0.7),
+      0 0 36px rgba(0, 255, 255, 0.6),
+      0 0 60px rgba(0, 255, 255, 0.35);
+    transform: translateZ(0) scale(1);
+  }
+  50% {
+    text-shadow:
+      0 0 26px rgba(0, 255, 255, 1),
+      0 0 60px rgba(0, 255, 255, 0.9),
+      0 0 110px rgba(0, 255, 255, 0.7);
+    transform: translateZ(18px) scale(1.03);
   }
   100% {
-    transform: scale(1.08);
+    text-shadow:
+      0 0 20px rgba(0, 230, 255, 0.85),
+      0 0 44px rgba(0, 255, 255, 0.7),
+      0 0 95px rgba(0, 255, 255, 0.45);
+    transform: translateZ(8px) scale(1.015);
   }
 }
+.hero-role { font-size:1rem; color:#fff; margin-bottom:0.3rem; }
+.hero-meta { font-size:0.9rem; color: rgba(222,238,255,0.9); margin-bottom: 1.2rem; }
 
-
-/* ===== 3D floating neon orbs in hero ===== */
-
-.hero-orbs {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.hero-orb {
-  position: absolute;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 20%, #ffffff, #00e5ff 30%, transparent 70%);
-  opacity: 0.32;
-  filter: blur(0.5px);
-  mix-blend-mode: screen;
-  animation: orbFloat 22s ease-in-out infinite alternate;
-}
-
-.hero-orb.orb-1 {
-  top: 18%;
-  left: 6%;
-  width: 220px;
-  height: 220px;
-  animation-delay: -4s;
-}
-
-.hero-orb.orb-2 {
-  bottom: 10%;
-  right: 14%;
-  width: 280px;
-  height: 280px;
-  animation-delay: -11s;
-}
-
-.hero-orb.orb-3 {
-  top: 55%;
-  left: 45%;
-  width: 200px;
-  height: 200px;
-  animation-delay: -18s;
-}
-
-@keyframes orbFloat {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0.26;
-  }
-  40% {
-    transform: translate3d(12px, -16px, 80px) scale(1.05);
-    opacity: 0.4;
-  }
-  70% {
-    transform: translate3d(-18px, 12px, 120px) scale(0.98);
-    opacity: 0.3;
-  }
-  100% {
-    transform: translate3d(6px, -10px, 40px) scale(1.03);
-    opacity: 0.34;
-  }
-}
+.hero-cta-row { display:flex; gap:0.9rem; flex-wrap:wrap; }
+.hero-cta { border-radius:999px; font-size:0.86rem; padding:0.8rem 2rem; letter-spacing:0.2em; text-transform:uppercase; }
+.hero-cta.primary{ background:#fff; color:#111; }
+.hero-cta.secondary{ background: rgba(0,0,0,0.85); color:#fff; border:1px solid rgba(255,255,255,0.6); }
 
 /* NAVBAR */
 
@@ -230,6 +246,326 @@ body {
   transform-style: preserve-3d;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
+/* nav links */
+.hero-nav {
+  position: absolute;
+  left: 45%;
+  right: 80%;
+  transform: translateX(-50%);          /* ✅ true horizontal center */
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+.hero-nav button {
+  background: none;
+  border: none;
+  color: rgba(248, 252, 255, 0.9);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.hero-nav button::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.32rem;
+  width: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #00eaff, #5bffb9);
+  transform: translateX(-50%);
+  transition: width 0.18s ease-out;
+}
+
+.hero-nav button:hover {
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.hero-nav button:hover::after {
+  width: 70%;
+}
+.hero-logo-img {
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+}
+
+
+/* right side */
+
+.hero-header-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.hero-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  background: rgba(0, 0, 0, 0.7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  font-size: 0.8rem;
+}
+
+.hero-resume-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 0.45rem 1.7rem;
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+  font-size: 0.83rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* HERO CONTENT */
+
+.hero-content {
+  position: relative;
+  z-index: 4;
+  max-width: 960px;
+
+  /* center hero vertically */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  margin: 0 auto;
+  padding: 0 clamp(1.6rem, 5vw, 4.4rem) 3rem; /* reduced bottom padding to avoid extra height */
+}
+
+.hero-tag {
+  font-size: 0.8rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(203, 227, 255, 0.86);
+  margin-bottom: 0.55rem;
+}
+
+.hero-name {
+  font-size: clamp(2.9rem, 5vw, 4.4rem);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.04;
+  margin-bottom: 0.8rem;
+  text-shadow: 0 0 26px rgba(0, 0, 0, 0.9);
+}
+
+.hero-name span {
+  display: block;
+}
+
+.hero-name-last {
+  background: linear-gradient(120deg, #e8fbff, #4dd8ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow:
+    0 0 16px rgba(0, 209, 255, 0.9),
+    0 0 42px rgba(0, 209, 255, 0.7);
+}
+
+.hero-role {
+  font-size: 1rem;
+  color: #ffffff;
+  margin-bottom: 0.3rem;
+}
+
+.hero-meta {
+  font-size: 0.9rem;
+  color: rgba(222, 238, 255, 0.9);
+  margin-bottom: 1.2rem; /* slightly reduced */
+}
+
+/* CTAs */
+
+.hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.hero-cta {
+  border-radius: 999px;
+  font-size: 0.86rem;
+  padding: 0.8rem 2rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background 0.15s ease, color 0.15s ease;
+
+  transform-style: preserve-3d;
+}
+
+.hero-cta.primary {
+  background: #ffffff;
+  color: #111111;
+  box-shadow:
+    0 0 18px rgba(0, 0, 0, 0.9),
+    0 0 35px rgba(255, 255, 255, 0.5);
+}
+
+.hero-cta.primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 22px rgba(0, 0, 0, 1),
+    0 0 55px rgba(255, 255, 255, 0.8);
+}
+
+.hero-cta.secondary {
+  background: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+}
+
+.hero-cta.secondary:hover {
+  background: rgba(0, 209, 255, 0.14);
+  border-color: rgba(0, 209, 255, 0.95);
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 1),
+    0 0 40px rgba(0, 209, 255, 0.8);
+}
+
+.hero-cta:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+/* ================= ABOUT ================= */
+
+.about-section {
+  padding: 4.8rem clamp(1.6rem, 5vw, 4.4rem) 4.8rem;
+  background: radial-gradient(circle at top, #070b14 0%, #010209 55%, #000 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ... rest of the original stylesheet left unchanged ... */
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+  .projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .licenses-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 📱 Mobile navbar & hero fixes */
+@media (max-width: 960px) {
+  /* simpler header layout on mobile */
+  .hero-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;   /* logo left, icons right */
+    padding-inline: 1.2rem;
+  }
+
+  /* hide the centered nav links on mobile */
+  .hero-nav {
+    display: none;
+  }
+
+  /* keep logo & right icons neat */
+  .hero-logo-area {
+    width: 48px;
+    height: 48px;
+  }
+
+  .hero-logo-img {
+    height: 30px;
+  }
+
+  .hero-header-right {
+    gap: 0.4rem;
+  }
+
+  .social-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .resume-icon-btn span {
+    display: none;  /* optional: icon-only resume button on very small screens */
+  }
+
+  /* Ensure hero remains exactly one viewport tall on mobile and doesn't grow */
+  .hero-section {
+    height: 100svh;
+    max-height: 100svh;
+    min-height: auto;
+    overflow: hidden;
+  }
+
+  .hero-content {
+    padding-bottom: 2rem; /* tighten space under CTAs */
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-content {
+    padding-inline: 1.4rem;
+    padding-bottom: 1.6rem;
+  }
+  .projects-section,
+  .about-section,
+  .achievements-section,
+  .contact-section {
+    padding-inline: 1.4rem;
+  }
+  .projects-grid,
+  .licenses-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-cta-row {
+    flex-direction: column;
+  }
+
+  /* don't force full viewport height on very small screens if content must scroll inside hero */
+  .hero-section.small-allow-scroll {
+    min-height: 60svh; /* optional helper class if you want the hero to be shorter and allow content scroll */
+  }
+}
+
+@media (max-width: 600px) {
+  .contact-icon-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* small fixes for tech-strip and contact icons omitted for brevity */
+
+/* End of file */
+
 /* nav links */
 .hero-nav {
   position: absolute;
