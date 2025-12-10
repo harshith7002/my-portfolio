@@ -188,7 +188,7 @@ const MainPage: React.FC = () => {
           </h1>
 
           <p className="hero-role">
-            Front-End Developer · UI Engineer · AI-ML Enthusiast
+            Web Developer · UI Engineer · AI-ML Enthusiast
           </p>
 
           <p className="hero-meta">
