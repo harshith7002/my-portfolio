@@ -51,7 +51,7 @@ const Intro: React.FC<IntroProps> = ({ onFinish }) => {
         </h1>
 
         <p className="intro-role">
-          Web Developer · AI/ML Engineer · Creator
+           Web Developer · UI Engineer · AI-ML Enthusiast
         </p>
 
         <button
