@@ -83,7 +83,7 @@ const Intro: React.FC<IntroProps> = ({ onFinish }) => {
           <span className="intro-heading-last">MOLUGURI</span>
         </h1>
 
-        <p className="intro-role"> Web Developer · UI Engineer · AI-ML Enthusiast</p>
+        <p className="intro-role"> Web Developer · APP Developer · AI-ML Enthusiast</p>
 
         <button className="intro-cta" onClick={handleEnter} disabled={isExiting}>
           {isExiting ? "Loading..." : "Enter Portfolio"}
