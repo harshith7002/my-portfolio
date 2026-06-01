@@ -30,9 +30,6 @@ const ACHIEVEMENTS: Achievement[] = [
 
 const SKILLS = ["Python", "Java", "C++", "Swift", "React", "TypeScript", "Node.js", "FastAPI", "PyTorch", "TensorFlow", "Scikit-learn", "Pandas", "MySQL", "PostgreSQL", "MongoDB", "Google Cloud"];
 
-/* ═══════════════════════════════════════
-   WEBGL SHADER SOURCES
-═══════════════════════════════════════ */
 const VERT = `
   attribute vec2 a_pos;
   void main(){ gl_Position = vec4(a_pos,0,1); }
@@ -122,10 +119,6 @@ const FRAG = `
     gl_FragColor=vec4(col,1);
   }
 `;
-
-/* ═══════════════════════════════════════
-   WEBGL HOOK
-═══════════════════════════════════════ */
 function useWebGL(
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
   mouseRef: React.MutableRefObject<{ x: number; y: number }>
