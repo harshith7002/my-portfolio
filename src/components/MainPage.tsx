@@ -368,7 +368,7 @@ export default function MainPage() {
 
         <div style={S.navRight}>
           
-          <a href="https://drive.google.com/file/d/1F350VhTyFlj1Oi4tYNQlJc6wxJFKr9Tk/view?usp=sharing" target="_blank" rel="noreferrer" style={{ ...S.resumeBtn, textDecoration: "none", display: "inline-block" }}>⬡ RESUME</a>
+          <a href="" target="_blank" rel="noreferrer" style={{ ...S.resumeBtn, textDecoration: "none", display: "inline-block" }}>⬡ RESUME</a>
         </div>
       </nav>
 
